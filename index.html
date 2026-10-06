@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diario de Estudio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Diario de Estudio</h1>
+    <div class="streaks">
+      <span class="current-streak">Racha actual: <strong id="current-streak">0</strong> días</span>
+      <span class="best-streak">Mejor racha: <strong id="best-streak">0</strong> días</span>
+      <span class="week-minutes">Esta semana: <strong id="week-minutes">0</strong> min</span>
+      <span class="days-this-month">Días este mes: <strong id="days-this-month">0</strong></span>
+    </div>
+  </header>
+
+  <!-- Mapa de calor: grid de 28 celdas (4 semanas × 7 días) -->
+  <section id="heat-map-section" class="heat-map-section">
+    <div id="heat-map" class="heat-map">
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      <div class="cell sessionless" data-tooltip=""></div>
+      </div>
+  </section>
+
+  <main>
+    <section class="form-section">
+      <h2>Registrar sesión</h2>
+      <form id="session-form">
+        <div class="form-group">
+          <label for="fecha">Fecha:</label>
+          <input type="date" id="fecha" name="fecha" value="" required>
+        </div>
+        <div class="form-group">
+          <label for="tema">Tema:</label>
+          <input type="text" id="tema" name="tema" required>
+        </div>
+        <div class="form-group">
+          <label for="minutos">Minutos:</label>
+          <input type="number" id="minutos" name="minutos" min="1" required>
+        </div>
+        <button type="submit" class="btn">Guardar sesión</button>
+      </form>
+    </section>
+
+    <section class="sessions-list">
+      <h2>Historial de sesiones</h2>
+      <!-- Empty state: device de dirección, no decoration/mood.
+           Indica qué pasó y qué puede hacer el usuario. -->
+      <p class="empty-state" id="empty-state">No hay sesiones registradas aún.<br>Usa el formulario de arriba para tu primera sesión.</p>
+      <ul id="sessions-list"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
