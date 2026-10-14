@@ -338,3 +338,117 @@ header {
     transition: none;
   }
 }
+
+/* --- Objetivo semanal y barra de progreso --- */
+.weekly-goal-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
+
+.weekly-goal-text {
+  font-size: 0.875rem;
+  color: var(--info);
+}
+
+.weekly-progress {
+  width: 100%;
+  height: 4px;
+  background: #cbd5e0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.weekly-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--success);
+  border-radius: 2px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.weekly-progress-fill.complete {
+  background: #276749;
+}
+
+.weekly-goal-check {
+  font-size: 0.75rem;
+  color: #276749;
+  margin-left: 0.25rem;
+}
+
+/* Controles de edición del objetivo semanal */
+.weekly-goal-edit {
+  display: flex;
+  gap: 0.25rem;
+  width: 100%;
+  align-items: center;
+}
+
+.weekly-goal-edit input {
+  flex: 1;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--muted);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+.weekly-goal-edit input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btn-small {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.btn-small:hover {
+  background: var(--muted);
+}
+
+.btn-small:focus-visible {
+  outline: 2px solid var(--success);
+  outline-offset: 2px;
+}
+
+/* Responsive: en móvil la barra ya es 100% por width: 100%.
+   En desktop, el wrapper limita el ancho al contenido. */
+@media (max-width: 479px) {
+  .weekly-goal-wrapper {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .weekly-goal-wrapper {
+    max-width: 280px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weekly-progress-fill {
+    transition: none;
+  }
+}
+
+/* Utility: solo lectores de pantalla (screen-reader only) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

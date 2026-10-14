@@ -2,6 +2,7 @@
 // No frameworks, no compilación. Funciona abriendo index.html por doble clic.
 
 const STORAGE_KEY = 'study-sessions'
+const GOAL_STORAGE_KEY = 'study-weekly-goal'
 const form = document.getElementById('session-form')
 const fechaInput = document.getElementById('fecha')
 const temaInput = document.getElementById('tema')
@@ -11,6 +12,17 @@ const currentStreakSpan = document.getElementById('current-streak')
 const bestStreakSpan = document.getElementById('best-streak')
 const weekMinutesSpan = document.getElementById('week-minutes')
 const daysThisMonthSpan = document.getElementById('days-this-month')
+
+// Referencias DOM para la meta semanal
+const weeklyGoalTextSpan = document.getElementById('weekly-goal-text')
+const weeklyGoalValueSpan = document.getElementById('weekly-goal-value')
+const weeklyProgressDiv = document.getElementById('weekly-progress')
+const weeklyProgressFillDiv = document.getElementById('weekly-progress-fill')
+const weeklyGoalCheckSpan = document.getElementById('weekly-goal-check')
+const weeklyGoalEditDiv = document.getElementById('weekly-goal-edit')
+const weeklyGoalInput = document.getElementById('weekly-goal-input')
+const weeklyGoalSaveBtn = document.getElementById('weekly-goal-save')
+const weeklyGoalClearBtn = document.getElementById('weekly-goal-clear')
 
 /**
  * Obtener sesiones de localStorage. Devuelve array vacío si no hay datos.
@@ -40,6 +52,56 @@ function getSessions() {
  */
 function saveSessions(sessions) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions))
+}
+
+/**
+ * Obtener la meta semanal de minutos desde localStorage.
+ * Devuelve un número > 0 si existe y es válido, o null en caso contrario.
+ */
+function getWeeklyGoal() {
+  const data = localStorage.getItem(GOAL_STORAGE_KEY)
+  if (!data) return null
+  try {
+    const parsed = JSON.parse(data)
+    const goal = parseInt(parsed, 10)
+    if (Number.isFinite(goal) && goal > 0) return goal
+    return null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Guardar la meta semanal de minutos en localStorage.
+ * Si goal es null o <= 0, elimina la clave; sino guarda el valor.
+ */
+function saveWeeklyGoal(goal) {
+  if (goal === null || goal <= 0) {
+    localStorage.removeItem(GOAL_STORAGE_KEY)
+  } else {
+    localStorage.setItem(GOAL_STORAGE_KEY, JSON.stringify(goal))
+  }
+}
+
+/**
+ * Calcular el progreso hacia la meta semanal como porcentaje.
+ * @param {number} weekMinutes - Minutos acumulados en la semana actual.
+ * @param {number|null} goal - Meta semanal en minutos (null o <=0 = sin meta).
+ * @returns {number} Porcentaje de progreso (0-100). Devuelve 0 si no hay meta válida.
+ */
+function calculateProgress(weekMinutes, goal) {
+  if (goal === null || goal <= 0) return 0
+  return Math.min(Math.round((weekMinutes / goal) * 100), 100)
+}
+
+/**
+ * Formatear el texto de la meta para mostrar junto a los minutos de la semana.
+ * @param {number|null} goal - Meta semanal en minutos (null o <=0 = sin meta).
+ * @returns {string} Texto formateado con espacio inicial, o string vacío si no hay meta.
+ */
+function formatGoalText(goal) {
+  if (goal === null || goal <= 0) return ''
+  return ` / Objetivo: ${goal} min`
 }
 
 /**
@@ -304,11 +366,51 @@ function updateStreakDisplay() {
 }
 
 /**
- * Actualizar la visualización de minutos de esta semana. */
+ * Actualizar la visualización de minutos de esta semana.
+ */
 function updateWeekMinutesDisplay() {
   const sessions = getSessions()
   const weekMinutes = calculateWeekMinutes(sessions)
   weekMinutesSpan.textContent = weekMinutes
+  // Integrar renderizado de la meta semanal
+  renderWeeklyGoal()
+}
+
+/**
+ * Renderizar la meta semanal y la barra de progreso.
+ * Lee las sesiones, calcula los minutos de la semana, obtiene la meta guardada,
+ * y actualiza todos los elementos DOM relacionados.
+ */
+function renderWeeklyGoal() {
+  const sessions = getSessions()
+  const weekMinutes = calculateWeekMinutes(sessions)
+  const goal = getWeeklyGoal()
+  const progress = calculateProgress(weekMinutes, goal)
+
+  // Actualizar los minutos de la semana en el header
+  weekMinutesSpan.textContent = weekMinutes
+
+  if (goal !== null) {
+    // Hay meta: mostrar valor, barra de progreso y check si se cumple
+    weeklyGoalValueSpan.textContent = goal
+    weeklyGoalTextSpan.textContent = formatGoalText(goal)
+    weeklyProgressDiv.hidden = false
+    weeklyProgressFillDiv.style.width = progress + '%'
+
+    if (progress >= 100) {
+      weeklyProgressFillDiv.classList.add('complete')
+      weeklyGoalCheckSpan.hidden = false
+    } else {
+      weeklyProgressFillDiv.classList.remove('complete')
+      weeklyGoalCheckSpan.hidden = true
+    }
+  } else {
+    // Sin meta: ocultar barra y check, limpiar texto
+    weeklyGoalTextSpan.textContent = ''
+    weeklyProgressDiv.hidden = true
+    weeklyGoalCheckSpan.hidden = true
+    weeklyGoalEditDiv.hidden = true
+  }
 }
 
 /**
@@ -373,6 +475,73 @@ form.addEventListener('submit', e => {
   updateWeekMinutesDisplay()
 })
 
+/**
+ * Lógica de edición inline para la meta semanal.
+ * Click en el texto/valor → entra en modo edición.
+ * Guardar: click en botón guardar, blur o Enter → valida y guarda.
+ * Borrar: click en botón borrar → elimina la meta.
+ * Escape → cancela y restaura vista.
+ */
+function setupWeeklyGoalEditing() {
+  const goal = getWeeklyGoal()
+
+  // Entrar en modo edición al hacer click en el texto o el valor de la meta
+  function enterEditMode() {
+    weeklyGoalTextSpan.hidden = true
+    weeklyGoalEditDiv.hidden = false
+    weeklyGoalInput.value = goal !== null ? goal : ''
+    weeklyGoalInput.focus()
+  }
+
+  weeklyGoalTextSpan.addEventListener('click', enterEditMode)
+  weeklyGoalValueSpan.addEventListener('click', enterEditMode)
+
+  // Guardar al click en botón guardar
+  weeklyGoalSaveBtn.addEventListener('click', () => {
+    const value = parseInt(weeklyGoalInput.value, 10)
+    if (value > 0) {
+      saveWeeklyGoal(value)
+      renderWeeklyGoal()
+    } else {
+      alert('El objetivo debe ser mayor que 0')
+    }
+  })
+
+  // Handler para blur - definido aquí para poder removerlo en Escape
+  function onBlurHandler() {
+    const value = parseInt(weeklyGoalInput.value, 10)
+    if (value > 0) {
+      saveWeeklyGoal(value)
+    } else {
+      saveWeeklyGoal(null)
+    }
+    renderWeeklyGoal()
+  }
+  weeklyGoalInput.addEventListener('blur', onBlurHandler)
+
+  weeklyGoalInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      weeklyGoalInput.blur()
+    } else if (e.key === 'Escape') {
+      // Escape cancela: restaura vista sin guardar
+      weeklyGoalInput.removeEventListener('blur', onBlurHandler)
+      weeklyGoalInput.blur()
+      // Re-add blur handler after a tick
+      setTimeout(() => weeklyGoalInput.addEventListener('blur', onBlurHandler), 0)
+      renderWeeklyGoal()
+    }
+  })
+
+  // Borrar meta al click en botón borrar
+  weeklyGoalClearBtn.addEventListener('click', () => {
+    saveWeeklyGoal(null)
+    renderWeeklyGoal()
+  })
+}
+
+// Inicializar la lógica de edición
+setupWeeklyGoalEditing()
+
 // Renderizar el mapa de calor
 function renderHeatMap() {
   const sessions = getSessions()
@@ -395,3 +564,4 @@ renderSessions()
 renderHeatMap()
 updateStreakDisplay()
 updateWeekMinutesDisplay()
+// renderWeeklyGoal() se llama internamente desde updateWeekMinutesDisplay()

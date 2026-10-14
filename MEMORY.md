@@ -8,6 +8,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - **Minutos esta semana añadidos**: cálculo y visualización en header (Lunes-Domingo, hora local del navegador).
 - **Mapa de calor (heat map) añadido**: grid de 28 celdas (4 semanas × 7 días, Lunes-Domingo) con intensidad de color según minutos, tooltip al hover, responsive.
 - **Sanitización de datos en localStorage**: `getSessions()` ahora valida y limpia datos (formato fecha YYYY-MM-DD, minutos como número, filtra inválidos).
+- **Objetivo semanal (weekly goal) añadido**: fijar meta de minutos/semana, barra de progreso en header, icono ✓ al 100%, edición inline, persistencia en `study-weekly-goal`.
 - Datos en localStorage.
 
 ## Decisiones (y por qué)
@@ -17,6 +18,7 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - La mejor racha recorre todo el historial de fechas ordenadas para encontrar el máximo de días consecutivos.
 - **Minutos de esta semana**: semana definida como Lunes-Domingo en hora local del navegador; se filtran sesiones por fecha y se suman minutos.
 - **Mapa de calor**: 28 celdas para 4 semanas calendario (Lunes-Domingo) terminando en la semana de hoy; días con sesión coloreados por intensidad (5 tonos verde fijos), días sin sesión con opacity 0.4; tooltip en español al hover.
+- **Objetivo semanal**: meta editable inline en header; barra 4px progresiva (verde → verde intenso + ✓ al 100%); clave localStorage separada `study-weekly-goal`; validación > 0; Escape cancela edición.
 - **Sanitización defensiva**: protege contra datos corruptos en localStorage (fechas con time component, minutos como string, campos vacíos).
 - Los datos se guardan bajo la clave `study-sessions` en localStorage.
 
@@ -31,6 +33,6 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 
 ## Próximos pasos
 - Spec 001-heat-map **completamente cumplida**: todos los RF (1-5) implementados y verificados, tests automatizados pasando (0 fallos), criterios de finalización satisfechos.
-- El supuesto conflicto RF-2/T7d era incorrecto: T7d prueba `formatTooltipMinutos`, no `computeIntensity`; T7a y T7c validan correctamente `#a5d6a7` para 60 min.
-- Verificar visualmente el mapa en móviles y desktop con Chrome DevTools si se desea.
-- Probar flujo completo: registrar sesión → ver mapa actualizarse sin recargar.
+- Spec 002-weekly-goal **implementada (T1-T6 completados)**: todos los RF (1-7) codificados, tests automatizados pasando (0 fallos). Pendiente: T7 verificación visual en Chrome DevTools (375px, 768px, 1024px+).
+- Verificar visualmente el objetivo semanal en móviles y desktop con Chrome DevTools.
+- Probar flujo completo: fijar objetivo → ver barra progreso → registrar sesiones → ver progreso actualizar → alcanzar 100% → ver ✓ → editar/borrar objetivo → recargar y confirmar persistencia.
