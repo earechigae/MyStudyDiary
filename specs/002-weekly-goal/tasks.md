@@ -26,10 +26,10 @@
   - **RF**: RNF‑2, RF‑1 a RF‑7 (cobertura)
   - **Hecho cuando**: Ejecutar `node --test test/weekly-goal.test.js` supera todos los asserts: `getWeeklyGoal` casos, `saveWeeklyGoal`, `calculateProgress` (0%, 50%, 100%, 150%→100%, sin objetivo), `formatGoalText`, tests estructura HTML (T5a–T5d).
 
-- [ ] **T7: Verificar responsividad y UX en Chrome DevTools**
+- [x] **T7: Verificar responsividad y UX en Chrome DevTools**
   - **RF**: RF‑3 (barra visible), RF‑4/RF‑5 (edición usable en móvil), RNF‑5
   - **Hecho cuando**: Verificado en Chrome DevTools: 375px (móvil) → barra ancho completo, input usable, botones tocables; 768px (tablet) → layout correcto; 1024px+ (desktop) → barra ancho contenido. Progreso ≥100% muestra verde intenso + ✓. Edición inline fluida. Sin errores en consola.
 
 ---
 
-*Checkboxes: [x] T1-T6 done, [ ] T7 pending*
+*Checkboxes: [x] T1-T7 done*
